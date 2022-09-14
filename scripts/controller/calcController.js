@@ -18,12 +18,22 @@ class CalcController{
         }, 1000)    //Função executada em um intervalo de tempo em ms
     }
 
+    addEventListenerAll(element, events, fn){
+        events.split(' ').forEach(event => {
+            element.addEventListener(event, fn, false);
+        })
+    }
+
     initButtonsEvents(){
         let buttons = document.querySelectorAll("#buttons >  g, #parts > g"); //seleciona toda classe button com descendencia em g
 
         buttons.forEach((btn, index)=>{ //forEach percorre todo id button
-            btn.addEventListener('click', e => {
+            this.addEventListenerAll(btn, 'click drag', e => {
                 console.log(btn.className.baseVal.replace("btn-",""));
+            });
+
+            this.addEventListenerAll(btn, "mouseover mouseup mousedown", e => {
+                btn.style.cursor = "pointer";
             })
         })
     }
