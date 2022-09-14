@@ -18,6 +18,10 @@ class CalcController{
         }, 1000)    //Função executada em um intervalo de tempo em ms
     }
 
+    initButtonsEvents(){
+        let buttons = document.querySelectorAll("#buttons >  g, #parts > g"); //seleciona toda classe button com descendencia em g
+    }
+
     setDisplayDateTime(){
         this.displayDate = this.currentDate.toLocaleDateString(this._locale, {
             day: "2-digit",
