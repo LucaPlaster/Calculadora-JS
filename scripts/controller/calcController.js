@@ -4,7 +4,7 @@ class CalcController {
 
         this._operation = [];
         this._locale = 'pt-BR';
-        this._displayCalcEl = document.querySelector("#display");
+        this._displayCalcEl = document.querySelector("#display"); //Seleciona elemntos por meio de seletores CSS3
         this._dateEl = document.querySelector("#data");
         this._timeEl = document.querySelector("#hora");
         this._currentDate;
@@ -21,13 +21,13 @@ class CalcController {
 
             this.setDisplayDateTime();
 
-        }, 1000);
+        }, 1000); //Função executada em um intervalo de tempo em ms
 
     }
 
     addEventListenerAll(element, events, fn){
 
-        events.split(' ').forEach(event => {
+        events.split(' ').forEach(event => { //forEach percorre todo id button
 
             element.addEventListener(event, fn, false);
 
@@ -43,13 +43,13 @@ class CalcController {
 
     clearEntry(){
 
-        this._operation.pop();
+        this._operation.pop(); //remove o último elemento de um array e retorna aquele elemento.
 
     }
 
     getLastOperation(){
 
-        return this._operation[this._operation.length-1];
+        return this._operation[this._operation.length-1]; //Pega o tamanho do elemnto do array a partir de 0
 
     }
 
@@ -65,9 +65,34 @@ class CalcController {
 
     }
 
-    addOperation(value){
+    pushOperation(value){
+        this._operation.push(value);
 
-        console.log('A', isNaN(this.getLastOperation()));
+        if (this._operation.length > 3){ //Só aparece depois de ter 4 elementos no array
+
+            let last = this._operation.pop();
+
+            this.calc();
+
+        }
+    }
+
+    calc(){
+        let last = this._operation.pop();
+
+        let result = eval(this._operation.join("")); //Join faz a mesma coisa que toString mas concatena tudo
+                                                     //eval - computa um código JavaScript representado como uma string.
+
+        this._operation = [result, last];
+    }
+
+    setLastNumberToDisplay(){
+
+        
+
+    }
+
+    addOperation(value){
 
         if (isNaN(this.getLastOperation())) {
 
@@ -77,23 +102,32 @@ class CalcController {
 
             } else if (isNaN(value)){
 
-                console.log(value);
+                console.log('TOKIII', value);
 
             } else {
 
-                this._operation.push(value);
+                this.pushOperation(value);
 
             }
 
         } else {
 
-            let newValue = this.getLastOperation().toString() + value.toString();
+            if (this.isOperator(value)){
 
-            this.setLastOperation(parseInt(newValue));
+                this.pushOperation(value);
 
+            } else {
+
+                let newValue = this.getLastOperation().toString() + value.toString(); 
+                // Transforma o numero e o operador em String para concatenar
+                this.setLastOperation(parseInt(newValue));
+
+                //atualizar display
+
+                this.setLastNumbertoDisplay();
+
+            }
         }
-
-        console.log(this._operation);
 
     }
 
@@ -152,7 +186,7 @@ class CalcController {
             case '6':
             case '7':
             case '8':
-            case '9':
+            case '9': 
                 this.addOperation(parseInt(value));
                 break;
 
@@ -166,9 +200,9 @@ class CalcController {
 
     initButtonsEvents(){
 
-        let buttons = document.querySelectorAll("#buttons > g, #parts > g");
+        let buttons = document.querySelectorAll("#buttons > g, #parts > g"); //seleciona toda classe button com descendencia em g
 
-        buttons.forEach((btn, index)=>{
+        buttons.forEach((btn, index)=>{ //forEach percorre todo id button
 
             this.addEventListenerAll(btn, "click drag", e => {
 
@@ -201,7 +235,7 @@ class CalcController {
 
     get displayTime(){
 
-        return this._timeEl.innerHTML;
+        return this._timeEl.innerHTML; //Manipula o HTML pelo DOM
 
     }
 
