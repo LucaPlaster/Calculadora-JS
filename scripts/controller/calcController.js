@@ -2,9 +2,12 @@ class CalcController {
 
     constructor(){
 
+        this._lastOperator = '';
+        this._lastNumber = '';
+
         this._operation = [];
         this._locale = 'pt-BR';
-        this._displayCalcEl = document.querySelector("#display"); //Seleciona elemntos por meio de seletores CSS3
+        this._displayCalcEl = document.querySelector("#display");
         this._dateEl = document.querySelector("#data");
         this._timeEl = document.querySelector("#hora");
         this._currentDate;
@@ -21,7 +24,7 @@ class CalcController {
 
             this.setDisplayDateTime();
 
-        }, 1000); //Função executada em um intervalo de tempo em ms
+        }, 1000);
 
         this.setLastNumberToDisplay();
 
@@ -29,7 +32,7 @@ class CalcController {
 
     addEventListenerAll(element, events, fn){
 
-        events.split(' ').forEach(event => { //forEach percorre todo id button
+        events.split(' ').forEach(event => {
 
             element.addEventListener(event, fn, false);
 
@@ -47,7 +50,7 @@ class CalcController {
 
     clearEntry(){
 
-        this._operation.pop(); //remove o último elemento de um array e retorna aquele elemento.
+        this._operation.pop();
 
         this.setLastNumberToDisplay();
 
@@ -55,7 +58,7 @@ class CalcController {
 
     getLastOperation(){
 
-        return this._operation[this._operation.length-1]; //Pega o tamanho do elemnto do array a partir de 0
+        return this._operation[this._operation.length-1];
 
     }
 
@@ -75,7 +78,7 @@ class CalcController {
 
         this._operation.push(value);
 
-        if (this._operation.length > 3) { //Só aparece depois de ter 4 elementos no array
+        if (this._operation.length > 3) {
 
             this.calc();
 
@@ -83,49 +86,91 @@ class CalcController {
 
     }
 
+    getResult(){
+
+
+
+        return eval(this._operation.join(""));
+
+    }
+
     calc(){
 
         let last = '';
+        
+        this._lastOperator = this.getLastItem();
 
-        if (this._operation.length > 3){
-            last = this._operation.pop();
+        if (this._operation.length < 3) {
+
+            let firstItem = this._operation[0];
+
+            this._operation = [firstItem, this._lastOperator, this._lastNumber];
+
         }
 
-        let result = eval(this._operation.join("")); //Join faz a mesma coisa que toString mas concatena tudo
-                                                     //eval - computa um código JavaScript representado como uma string.
+        if (this._operation.length > 3) {
 
-        if (last == '%'){
+            last = this._operation.pop();
+
+            this._lastNumber = this.getResult();
+
+        } else if (this._operation.length == 3) {
+
+            this._lastNumber = this.getLastItem(false);
+
+        }
+        
+        let result = this.getResult();
+
+        if (last == '%') {
 
             result /= 100;
-            this._operation = [result];
-
-        } else { 
 
             this._operation = [result];
 
-            if(last) this._operation.push(last);
+        } else {
 
-        } 
+            this._operation = [result];
+
+            if (last) this._operation.push(last);
+
+        }
 
         this.setLastNumberToDisplay();
 
     }
 
-    setLastNumberToDisplay(){
+    getLastItem(isOperator = true){
 
-        let lastNumber;
+        let lastItem;
 
         for (let i = this._operation.length-1; i >= 0; i--){
 
-            if (!this.isOperator(this._operation[i])) {
-                lastNumber = this._operation[i];
+            if (this.isOperator(this._operation[i]) == isOperator) {
+    
+                lastItem = this._operation[i];
+    
                 break;
-
+    
             }
 
         }
 
-        if(!lastNumber) lastNumber = 0;
+        if (!lastItem) {
+
+            lastItem = (isOperator) ? this._lastOperator : this._lastNumber;
+
+        }
+
+        return lastItem;
+
+    }
+
+    setLastNumberToDisplay(){
+
+        let lastNumber = this.getLastItem(false);
+
+        if (!lastNumber) lastNumber = 0;
 
         this.displayCalc = lastNumber;
 
@@ -241,9 +286,9 @@ class CalcController {
 
     initButtonsEvents(){
 
-        let buttons = document.querySelectorAll("#buttons > g, #parts > g"); //seleciona toda classe button com descendencia em g
+        let buttons = document.querySelectorAll("#buttons > g, #parts > g");
 
-        buttons.forEach((btn, index)=>{ //forEach percorre todo id button
+        buttons.forEach((btn, index)=>{
 
             this.addEventListenerAll(btn, "click drag", e => {
 
@@ -267,7 +312,7 @@ class CalcController {
 
         this.displayDate = this.currentDate.toLocaleDateString(this._locale, {
             day: "2-digit",
-            month: "long",
+            month: "short",
             year: "numeric"
         });
         this.displayTime = this.currentDate.toLocaleTimeString(this._locale);
@@ -276,7 +321,7 @@ class CalcController {
 
     get displayTime(){
 
-        return this._timeEl.innerHTML; //Manipula o HTML pelo DOM
+        return this._timeEl.innerHTML;
 
     }
 
